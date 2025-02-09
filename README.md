@@ -13,6 +13,8 @@ A command-line tool that enforces consistent Git commit message formats across y
 
 ## Installation
 
+A standalone installer will be available soon. In the meantime, you can install the by building it from source.
+
 ### From Source
 
 ```bash
