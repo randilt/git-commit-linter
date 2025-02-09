@@ -3,6 +3,7 @@ package linter
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -22,6 +23,52 @@ type LintError struct {
 
 func New(cfg *config.Config) *Linter {
     return &Linter{config: cfg}
+}
+
+// LintCommitMessage lints a single commit message from a string
+func (l *Linter) LintCommitMessage(message string) error {
+    // Create a temporary commit object to reuse existing logic
+    tempCommit := git.Commit{
+        Hash:    "UNCOMMITTED",
+        Message: message,
+    }
+    
+    if err := l.lintCommit(tempCommit); err != nil {
+        var output bytes.Buffer
+        
+        output.WriteString("\nLinting Issues Found:\n")
+        output.WriteString("==================\n\n")
+        output.WriteString(fmt.Sprintf("Error: %s\n", err.Error()))
+        output.WriteString("\nReference Information:\n")
+        output.WriteString("====================\n")
+        output.WriteString(fmt.Sprintf("Valid commit format: type(scope): message (max %d chars)\n", l.config.Rules.MaxMessageLength))
+        output.WriteString(fmt.Sprintf("Allowed types: %s\n", strings.Join(l.config.Types, ", ")))
+        
+        fmt.Print(output.String())
+        return fmt.Errorf("commit message failed linting - please fix the issues above")
+    }
+    
+    return nil
+}
+
+// LintCommitMessageFile lints a commit message from a file path
+func (l *Linter) LintCommitMessageFile(filepath string) error {
+    content, err := os.ReadFile(filepath)
+    if err != nil {
+        return fmt.Errorf("failed to read commit message file: %w", err)
+    }
+    
+    // Clean the message - remove comments and empty lines
+    lines := strings.Split(string(content), "\n")
+    var messageLines []string
+    for _, line := range lines {
+        if !strings.HasPrefix(strings.TrimSpace(line), "#") && len(strings.TrimSpace(line)) > 0 {
+            messageLines = append(messageLines, line)
+        }
+    }
+    message := strings.Join(messageLines, "\n")
+    
+    return l.LintCommitMessage(strings.TrimSpace(message))
 }
 
 // LintCommits lints the commit messages in the given range
