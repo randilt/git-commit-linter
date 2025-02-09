@@ -24,6 +24,9 @@ func New(cfg *config.Config) *Linter {
     return &Linter{config: cfg}
 }
 
+// LintCommits lints the commit messages in the given range
+// and returns an error if any commit fails the linting rules.
+// to use in cli, run `git-commit-linter --config=config.yaml --check="HEAD~5..HEAD"` (checks last 5 commits)
 func (l *Linter) LintCommits(commitRange string) error {
     commits, err := git.GetCommits(commitRange)
     if err != nil {
@@ -74,6 +77,7 @@ func (l *Linter) getFixInstructions(commit git.Commit) string {
     var instructions strings.Builder
     instructions.WriteString("Fix Instructions:\n")
 
+	// Check if this is the latest commit
     isLatestCommit := strings.Contains(commit.Hash, "HEAD")
     if isLatestCommit {
         instructions.WriteString("- Latest commit: Use amend\n")
