@@ -1,6 +1,7 @@
 package linter
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
 	"strings"
@@ -13,6 +14,12 @@ type Linter struct {
     config *config.Config
 }
 
+type LintError struct {
+    CommitHash string
+    Message    string
+    FixSteps   string
+}
+
 func New(cfg *config.Config) *Linter {
     return &Linter{config: cfg}
 }
@@ -23,50 +30,70 @@ func (l *Linter) LintCommits(commitRange string) error {
         return fmt.Errorf("failed to get commits: %w", err)
     }
 
-    var hasErrors bool
+    var lintErrors []LintError
     for _, commit := range commits {
         if err := l.lintCommit(commit); err != nil {
-            fmt.Printf("\nCommit %s: %v\n", commit.Hash[:8], err)
-            // Print fix instructions
-            l.printFixInstructions(commit, err)
-            hasErrors = true
+            lintError := LintError{
+                CommitHash: commit.Hash[:8],
+                Message:    err.Error(),
+                FixSteps:   l.getFixInstructions(commit),
+            }
+            lintErrors = append(lintErrors, lintError)
         }
     }
 
-    if hasErrors {
-        return fmt.Errorf("\nsome commits failed linting - see fix instructions above")
+    if len(lintErrors) > 0 {
+        var output bytes.Buffer
+
+        // Print summary header
+        output.WriteString("\nLinting Issues Found:\n")
+        output.WriteString("==================\n\n")
+
+        // Print each error with its fix instructions
+        for _, err := range lintErrors {
+            output.WriteString(fmt.Sprintf("Commit %s: %s\n", err.CommitHash, err.Message))
+            output.WriteString(err.FixSteps)
+            output.WriteString("\n")
+        }
+
+        // Print reference information once at the end
+        output.WriteString("\nReference Information:\n")
+        output.WriteString("====================\n")
+        output.WriteString(fmt.Sprintf("Valid commit format: type(scope): message (max %d chars)\n", l.config.Rules.MaxMessageLength))
+        output.WriteString(fmt.Sprintf("Allowed types: %s\n", strings.Join(l.config.Types, ", ")))
+
+        fmt.Print(output.String())
+        return fmt.Errorf("commits failed linting - please fix the issues above")
     }
+
+    fmt.Println("All commits passed linting!")
     return nil
 }
 
-func (l *Linter) printFixInstructions(commit git.Commit, lintErr error) {
-    fmt.Println("\nTo fix this issue:")
+func (l *Linter) getFixInstructions(commit git.Commit) string {
+    var instructions strings.Builder
+    instructions.WriteString("Fix Instructions:\n")
 
-    // Check if this is the latest commit
     isLatestCommit := strings.Contains(commit.Hash, "HEAD")
-    
     if isLatestCommit {
-        fmt.Println("This is your latest commit. You can fix it using:")
-        fmt.Printf("  git commit --amend -m \"your-new-message\"\n")
+        instructions.WriteString("- Latest commit: Use amend\n")
+        instructions.WriteString("  git commit --amend -m \"type(scope): your message\"\n")
     } else {
-        fmt.Printf("This is an older commit. You can fix it using interactive rebase\nuse: git rebase -i %s~1\n", commit.Hash[:8])
+        instructions.WriteString("- Older commit: Use interactive rebase\n")
+        instructions.WriteString(fmt.Sprintf("  git rebase -i %s~1\n", commit.Hash[:8]))
+        instructions.WriteString("  Change 'pick' to 'reword' for the target commit\n")
     }
 
-    fmt.Println("\nExample of valid commit message format:")
-    fmt.Printf("  feat(scope): your message (max %d chars)\n", l.config.Rules.MaxMessageLength)
-    
-    // Print allowed types
-    fmt.Println("\nAllowed types:", strings.Join(l.config.Types, ", "))
+    return instructions.String()
 }
 
 func (l *Linter) lintCommit(commit git.Commit) error {
-    // Regular expression for commit message format
     pattern := `^([\w]+)(?:\(([\w-]+)\))?: (.+)$`
     re := regexp.MustCompile(pattern)
 
     matches := re.FindStringSubmatch(commit.Message)
     if matches == nil {
-        return fmt.Errorf("invalid commit message format - must follow pattern: type(scope): message")
+        return fmt.Errorf("invalid format")
     }
 
     commitType := matches[1]
@@ -82,7 +109,7 @@ func (l *Linter) lintCommit(commit git.Commit) error {
         }
     }
     if !validType {
-        return fmt.Errorf("invalid commit type '%s'", commitType)
+        return fmt.Errorf("invalid type '%s'", commitType)
     }
 
     // Check scope if required
@@ -92,7 +119,7 @@ func (l *Linter) lintCommit(commit git.Commit) error {
 
     // Check message length
     if len(message) > l.config.Rules.MaxMessageLength {
-        return fmt.Errorf("message length is %d chars (maximum is %d)", 
+        return fmt.Errorf("message too long (%d chars, max %d)", 
             len(message), l.config.Rules.MaxMessageLength)
     }
 
