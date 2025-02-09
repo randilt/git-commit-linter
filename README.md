@@ -155,6 +155,19 @@ git rebase -i <commit-hash>~1
 # Change 'pick' to 'reword' for the target commit
 ```
 
+3. If you have already pushed the commit, you will need to force push:
+
+```bash
+git push --force-with-lease
+```
+
+`--force-with-lease` will prevent you from overwriting changes on the remote branch that you are not aware of.
+But if you are sure that you want to overwrite the remote branch, you can use `--force` instead.
+
+```bash
+git push --force
+```
+
 ## Development
 
 ### Running Tests
