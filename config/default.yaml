@@ -1,0 +1,19 @@
+types:
+  - feat
+  - fix
+  - docs
+  - style
+  - refactor
+  - test
+  - chore
+
+scopes:
+  - auth
+  - api
+  - ui
+  - db
+  - config
+
+rules:
+  require_scope: false
+  max_message_length: 72
