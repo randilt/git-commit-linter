@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/randilt/git-commit-linter/internal/ui"
 )
 
 const hookContent = `#!/bin/sh
@@ -32,22 +34,14 @@ func InstallHook() error {
 		}
 
 		// Prompt user for action
-		fmt.Println("commit-msg hook already exists.")
-		fmt.Println("Current hook content:")
-		fmt.Println("-------------------")
-		fmt.Print(string(content))
-		fmt.Println("-------------------")
-		fmt.Print("\n")
-		fmt.Println("This will be overwritten with:")
-		fmt.Println("-------------------")
-		fmt.Print(hookContent)
-		fmt.Println("-------------------")
-		fmt.Print("Do you want to overwrite it? [y/N]: ")
+		ui.Section("Existing Hook")
+		ui.Warning("A commit-msg hook already exists")
+		ui.Info("Current hook content:")
+		ui.CodeBlock(string(content))
 
-		var response string
-		fmt.Scanln(&response)
+		response := ui.Prompt("Do you want to overwrite it? [y/N]:")
 		if response != "y" && response != "Y" {
-			fmt.Println("Hook installation cancelled")
+			ui.Error("Hook installation cancelled")
 			return nil
 		}
 	}
@@ -62,10 +56,10 @@ func InstallHook() error {
 	if _, err := os.Stat(samplePath); err == nil {
 		backupPath := samplePath + ".backup"
 		if err := os.Rename(samplePath, backupPath); err != nil {
-			fmt.Printf("Warning: Could not backup sample hook: %v\n", err)
+			ui.Warning(fmt.Sprintf("Could not backup sample hook: %v", err))
 		}
 	}
 
-	fmt.Println("Git commit-msg hook installed successfully!")
+	ui.Success("Git commit-msg hook installed successfully!")
 	return nil
 }
