@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     - go mod tidy
@@ -25,8 +27,7 @@ builds:
     binary: git-commit-linter
 
 archives:
-  - format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of `uname`.
+  - id: binary
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -34,13 +35,17 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    format_overrides:
-      - goos: windows
-        format: zip
     files:
       - README.md
       - LICENSE
       - config/default.yaml
+    formats: ["tar.gz"]
+    wrap_in_directory: true
+    builds:
+      - git-commit-linter
+    format_overrides:
+      - goos: windows
+        formats: ["zip"]
 
 checksum:
   name_template: "checksums.txt"
