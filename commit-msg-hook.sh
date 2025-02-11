@@ -11,7 +11,11 @@ HOOK_PATH=".git/hooks/commit-msg"
 if [ -f "$HOOK_PATH" ]; then
   # Ask the user if they want to overwrite the existing commit-msg hook
   echo "commit-msg hook already exists."
-  read -p "Do you want to overwrite it? (y/n): " choice
+  echo "Options: "
+  echo "  y/Y  - Overwrite the commit-msg hook"
+  echo "  n/N  - Cancel the operation"
+  echo "  v/V  - View the current commit-msg hook content"
+  read -p "Select an option (y/n/v): " choice
 
   case "$choice" in
     y|Y)
@@ -20,6 +24,24 @@ if [ -f "$HOOK_PATH" ]; then
     n|N)
       echo "Operation canceled. No changes made."
       exit 0
+      ;;
+    v|V)
+      echo "Displaying current commit-msg hook content:"
+      cat "$HOOK_PATH"
+      read -p "Do you still want to overwrite? (y/n): " overwrite_choice
+      case "$overwrite_choice" in
+        y|Y)
+          echo "Overwriting commit-msg hook..."
+          ;;
+        n|N)
+          echo "Operation canceled. No changes made."
+          exit 0
+          ;;
+        *)
+          echo "Invalid choice. Operation canceled."
+          exit 1
+          ;;
+      esac
       ;;
     *)
       echo "Invalid choice. Operation canceled."
