@@ -25,4 +25,5 @@ go.work.sum
 .env
 
 dist/
+lint-test
 RELEASE_GUIDE.md
