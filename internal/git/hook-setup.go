@@ -35,7 +35,12 @@ func InstallHook() error {
 		fmt.Println("commit-msg hook already exists.")
 		fmt.Println("Current hook content:")
 		fmt.Println("-------------------")
-		fmt.Println(string(content))
+		fmt.Print(string(content))
+		fmt.Println("-------------------")
+		fmt.Print("\n")
+		fmt.Println("This will be overwritten with:")
+		fmt.Println("-------------------")
+		fmt.Print(hookContent)
 		fmt.Println("-------------------")
 		fmt.Print("Do you want to overwrite it? [y/N]: ")
 
