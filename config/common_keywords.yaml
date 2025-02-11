@@ -110,5 +110,5 @@ commit_scopes:
       "performance", "optimize", "speed", "efficiency", "latency", "throughput",
       "benchmark", "profiling", "bottleneck", "memory", "cpu", "cache",
       "concurrent", "parallel", "async", "load", "scale", "resource",
-      "response-time", "bandwidth", "optimization", "fast", "slow"
+      "response-time", "bandwidth", "optimization", "fast", "slow", "response time"
     ]
