@@ -28,7 +28,7 @@ cd git-commit-linter
 go build -o git-commit-linter
 
 # Move to a directory in your PATH so you can run it from anywhere (optional)
-mv git-commit-linter /usr/local/bin/
+sudo mv git-commit-linter /usr/local/bin/
 ```
 
 ## Usage
