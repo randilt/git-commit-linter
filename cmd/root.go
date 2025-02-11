@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/randilt/git-commit-linter/internal/config"
+	"github.com/randilt/git-commit-linter/internal/git"
 	"github.com/randilt/git-commit-linter/internal/linter"
 	"github.com/spf13/cobra"
 )
@@ -22,6 +23,16 @@ var (
 Example: git-commit-linter --config=config.yaml --check="HEAD~5..HEAD"`,
 		RunE: runLinter,
 	}
+
+     installHookCmd = &cobra.Command{
+	Use:   "install-hook",
+	Short: "Install git commit-msg hook",
+	Long: `Installs a git commit-msg hook that will automatically lint 
+commit messages before they are committed.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return git.InstallHook()
+	},
+}
 
 	versionCmd = &cobra.Command{
 		Use:   "version",
@@ -54,6 +65,7 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "path to config file")
 	rootCmd.PersistentFlags().StringVar(&commitRange, "check", "HEAD^..HEAD", "commit range to check")
+    rootCmd.AddCommand(installHookCmd)
 	rootCmd.AddCommand(lintFileCmd)
 	rootCmd.AddCommand(versionCmd)
 }
