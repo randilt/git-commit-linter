@@ -1,7 +1,6 @@
 package linter
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"regexp"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/randilt/git-commit-linter/internal/config"
 	"github.com/randilt/git-commit-linter/internal/git"
+	"github.com/randilt/git-commit-linter/internal/ui"
 )
 
 type Linter struct {
@@ -34,20 +34,19 @@ func (l *Linter) LintCommitMessage(message string) error {
     }
     
     if err := l.lintCommit(tempCommit); err != nil {
-        var output bytes.Buffer
+        ui.Section("Linting Issues Found")
+        ui.Error(err.Error())
         
-        output.WriteString("\nLinting Issues Found:\n")
-        output.WriteString("==================\n\n")
-        output.WriteString(fmt.Sprintf("Error: %s\n", err.Error()))
-        output.WriteString("\nReference Information:\n")
-        output.WriteString("====================\n")
-        output.WriteString(fmt.Sprintf("Valid commit format: type(scope): message (max %d chars)\n", l.config.Rules.MaxMessageLength))
-        output.WriteString(fmt.Sprintf("Allowed types: %s\n", strings.Join(l.config.Types, ", ")))
+        ui.Section("Reference Information")
+        ui.Info(fmt.Sprintf("Valid commit format: %s", 
+            ui.Bold(fmt.Sprintf("type(scope): message (max %d chars)", l.config.Rules.MaxMessageLength))))
+        ui.Info(fmt.Sprintf("Allowed types: %s", 
+            ui.Bold(strings.Join(l.config.Types, ", "))))
         
-        fmt.Print(output.String())
         return fmt.Errorf("commit message failed linting - please fix the issues above")
     }
     
+    ui.Success("Commit message passed linting!")
     return nil
 }
 
@@ -93,30 +92,25 @@ func (l *Linter) LintCommits(commitRange string) error {
     }
 
     if len(lintErrors) > 0 {
-        var output bytes.Buffer
-
-        // Print summary header
-        output.WriteString("\nLinting Issues Found:\n")
-        output.WriteString("==================\n\n")
+        ui.Section("Linting Issues Found")
 
         // Print each error with its fix instructions
         for _, err := range lintErrors {
-            output.WriteString(fmt.Sprintf("Commit %s: %s\n", err.CommitHash, err.Message))
-            output.WriteString(err.FixSteps)
-            output.WriteString("\n")
+            ui.Error(fmt.Sprintf("Commit %s: %s", ui.Bold(err.CommitHash), err.Message))
+            ui.CodeBlock(err.FixSteps)
         }
 
-        // Print reference information once at the end
-        output.WriteString("\nReference Information:\n")
-        output.WriteString("====================\n")
-        output.WriteString(fmt.Sprintf("Valid commit format: type(scope): message (max %d chars)\n", l.config.Rules.MaxMessageLength))
-        output.WriteString(fmt.Sprintf("Allowed types: %s\n", strings.Join(l.config.Types, ", ")))
+        ui.Section("Reference Information")
+        ui.Info(fmt.Sprintf("Valid commit format: %s", 
+            ui.Bold(fmt.Sprintf("type(scope): message (max %d chars)", l.config.Rules.MaxMessageLength))))
+        ui.Info(fmt.Sprintf("Allowed types: %s", 
+            ui.Bold(strings.Join(l.config.Types, ", "))))
 
-        fmt.Print(output.String())
-        return fmt.Errorf("commits failed linting - please fix the issues above")
+        ui.Error("Some commits failed linting - please fix the issues above")
+        return nil
     }
 
-    fmt.Println("All commits passed linting!")
+    ui.Success("All commits passed linting!")
     return nil
 }
 
@@ -124,7 +118,7 @@ func (l *Linter) getFixInstructions(commit git.Commit) string {
     var instructions strings.Builder
     instructions.WriteString("Fix Instructions:\n")
 
-	// Check if this is the latest commit
+    // Check if this is the latest commit
     isLatestCommit := strings.Contains(commit.Hash, "HEAD")
     if isLatestCommit {
         instructions.WriteString("- Latest commit: Use amend\n")
