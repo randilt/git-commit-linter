@@ -1,0 +1,114 @@
+commit_types:
+  - name: "feat"
+    description: "A new feature or functionality"
+    keywords: [
+      "add", "introduce", "create", "support", "implement", "new", "feature", "enhance", "build",
+      "enable", "develop", "initialize", "setup", "start", "begin", "launch", "deliver",
+      "provide", "extend", "upgrade", "expand", "integrate", "incorporate", "establish"
+    ]
+  - name: "fix"
+    description: "A bug fix or issue resolution"
+    keywords: [
+      "bug", "fix", "issue", "error", "resolve", "crash", "broken", "patch", "restore",
+      "repair", "solve", "correct", "handle", "address", "mitigate", "eliminate",
+      "workaround", "recover", "stabilize", "normalize", "revert", "rollback",
+      "hotfix", "debug", "troubleshoot", "investigate"
+    ]
+  - name: "docs"
+    description: "Documentation changes"
+    keywords: [
+      "doc", "documentation", "readme", "tutorial", "guide", "explain", "comment",
+      "changelog", "manual", "instruction", "api-doc", "javadoc", "annotation",
+      "description", "specification", "reference", "example", "sample", "note",
+      "clarify", "document", "update-docs", "wiki", "contributing"
+    ]
+  - name: "style"
+    description: "Code style or formatting changes"
+    keywords: [
+      "style", "formatting", "indent", "refactor", "layout", "whitespace", "align", "clean",
+      "lint", "prettier", "eslint", "format", "spacing", "tabulation", "semicolon",
+      "convention", "standard", "consistency", "beautify", "organize", "arrange",
+      "structure", "rename", "reorder"
+    ]
+  - name: "refactor"
+    description: "Code refactoring without functional changes"
+    keywords: [
+      "refactor", "restructure", "cleanup", "optimize", "improve", "simplify", "remove",
+      "reorganize", "rewrite", "modernize", "streamline", "enhance", "consolidate",
+      "standardize", "normalize", "abstract", "encapsulate", "modularize", "decouple",
+      "split", "merge", "extract", "isolate", "generalize", "refine"
+    ]
+  - name: "test"
+    description: "Changes related to tests"
+    keywords: [
+      "test", "testing", "unit", "mock", "assert", "coverage", "check", "validate",
+      "verification", "integration-test", "e2e", "regression", "benchmark", "spec",
+      "scenario", "suite", "fixture", "stub", "simulation", "quality", "automation",
+      "tdd", "bdd", "acceptance", "smoke-test", "load-test", "stress-test"
+    ]
+  - name: "chore"
+    description: "Chores or non-functional tasks like build, CI configuration, etc."
+    keywords: [
+      "chore", "build", "ci", "config", "upgrade", "setup", "maintain",
+      "dependency", "package", "version", "release", "bump", "automation",
+      "scaffold", "tooling", "infrastructure", "housekeeping", "maintenance",
+      "cleanup", "organize", "manage", "update-deps", "vendor", "third-party"
+    ]
+
+commit_scopes:
+  - name: "api"
+    description: "Changes related to the API"
+    keywords: [
+      "endpoint", "api", "request", "response", "route", "handler",
+      "rest", "graphql", "webhook", "middleware", "controller", "service",
+      "resource", "payload", "parameter", "validation", "serializer",
+      "protocol", "interface", "gateway", "proxy", "cors", "cache"
+    ]
+  - name: "ui"
+    description: "Changes related to the user interface"
+    keywords: [
+      "button", "modal", "layout", "navbar", "menu", "style", "form",
+      "component", "widget", "view", "page", "screen", "template", "theme",
+      "responsive", "mobile", "desktop", "animation", "transition", "icon",
+      "image", "font", "color", "accessibility", "ux", "interaction"
+    ]
+  - name: "db"
+    description: "Changes related to the database"
+    keywords: [
+      "schema", "model", "migration", "query", "index", "db",
+      "database", "table", "column", "field", "relation", "orm",
+      "sql", "nosql", "mongodb", "postgresql", "mysql", "redis",
+      "cache", "storage", "backup", "restore", "seed", "transaction"
+    ]
+  - name: "auth"
+    description: "Changes related to authentication and authorization"
+    keywords: [
+      "auth", "login", "signup", "token", "permission",
+      "authentication", "authorization", "jwt", "oauth", "sso",
+      "password", "credential", "session", "cookie", "security",
+      "role", "access", "identity", "user", "admin", "privilege"
+    ]
+  - name: "config"
+    description: "Changes related to configuration files"
+    keywords: [
+      "config", "settings", "env", "yaml", "json",
+      "environment", "variable", "constant", "parameter", "option",
+      "property", "preference", "setup", "initialization", "bootstrap",
+      "profile", "configuration", "flag", "toggle", "feature-flag"
+    ]
+  - name: "ci_cd"
+    description: "Changes related to CI/CD configuration"
+    keywords: [
+      "ci", "cd", "pipeline", "build", "deploy", "test",
+      "jenkins", "github-actions", "gitlab-ci", "travis", "circle-ci",
+      "workflow", "automation", "release", "stage", "environment",
+      "artifact", "container", "docker", "kubernetes", "helm"
+    ]
+  - name: "performance"
+    description: "Performance improvements"
+    keywords: [
+      "performance", "optimize", "speed", "efficiency", "latency", "throughput",
+      "benchmark", "profiling", "bottleneck", "memory", "cpu", "cache",
+      "concurrent", "parallel", "async", "load", "scale", "resource",
+      "response-time", "bandwidth", "optimization", "fast", "slow"
+    ]
