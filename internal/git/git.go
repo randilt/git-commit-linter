@@ -10,6 +10,19 @@ type Commit struct {
     Message string
 }
 
+// GetCommits returns a list of commits from a commit range
+//
+// The function accepts a Git commit range (e.g., "HEAD~5..HEAD") and returns a list of commits
+// in the range.
+// 
+// Example usage:
+//  commits, err := git.GetCommits("HEAD~5..HEAD") 
+// if err != nil {
+//    fmt.Printf("Error getting commits: %v\n", err)
+//   return
+// }
+// 
+// Returns a list of commits or an error if the command fails
 func GetCommits(commitRange string) ([]Commit, error) {
     cmd := exec.Command("git", "log", "--format=%H%n%B%n---", commitRange)
     output, err := cmd.Output()

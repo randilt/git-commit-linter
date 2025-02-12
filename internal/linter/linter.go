@@ -70,9 +70,25 @@ func (l *Linter) LintCommitMessageFile(filepath string) error {
     return l.LintCommitMessage(strings.TrimSpace(message))
 }
 
-// LintCommits lints the commit messages in the given range
-// and returns an error if any commit fails the linting rules.
-// to use in cli, run `git-commit-linter --config=config.yaml --check="HEAD~5..HEAD"` (checks last 5 commits)
+// LintCommits lints the commit messages in the given range and returns an error if any commit fails the linting rules.
+//
+// The function accepts a Git commit range (e.g., "HEAD~5..HEAD") and validates each commit message against
+// the configured linting rules. It performs the following checks:
+//   - Commit message format validation
+//   - Commit type verification
+//   - Scope requirement check (if enabled)
+//   - Message length validation
+//
+// For any commits that fail validation, it generates detailed error messages including:
+//   - The commit hash
+//   - The specific validation failure
+//   - Step-by-step instructions for fixing the commit
+//
+// Example usage:
+//
+//	git-commit-linter --config=config.yaml --check="HEAD~5..HEAD"
+//
+// Returns nil if all commits pass validation, or error details if any commits fail.
 func (l *Linter) LintCommits(commitRange string) error {
     commits, err := git.GetCommits(commitRange)
     if err != nil {

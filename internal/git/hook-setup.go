@@ -16,6 +16,14 @@ git-commit-linter lint-file "$commit_msg_file" || exit 1
 `
 
 // InstallHook installs the commit-msg hook in the current git repository
+// 
+// Example usage:
+// if err := git.InstallHook(); err != nil {
+//    fmt.Printf("Error installing hook: %v\n", err)
+//  return
+// }
+// 
+// Prints a success message if the hook is installed successfully
 func InstallHook() error {
 	// Check if inside a git directory
 	if _, err := os.Stat(".git"); os.IsNotExist(err) {
