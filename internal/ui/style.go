@@ -44,7 +44,7 @@ func Warning(message string) {
 
 // Section prints a section header
 func Section(title string) {
-	fmt.Printf("\n%s\n%s\n", 
+	fmt.Printf("\n%s\n%s\n",
 		boldText(title),
 		dimText(strings.Repeat("─", len(title))))
 }
