@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	version    string
-	commit     string
-	date       string
-	configPath string
+	version     string
+	commit      string
+	date        string
+	configPath  string
 	commitRange string
 
 	rootCmd = &cobra.Command{
@@ -24,15 +24,15 @@ Example: git-commit-linter --config=config.yaml --check="HEAD~5..HEAD"`,
 		RunE: runLinter,
 	}
 
-     installHookCmd = &cobra.Command{
-	Use:   "install-hook",
-	Short: "Install git commit-msg hook",
-	Long: `Installs a git commit-msg hook that will automatically lint 
+	installHookCmd = &cobra.Command{
+		Use:   "install-hook",
+		Short: "Install git commit-msg hook",
+		Long: `Installs a git commit-msg hook that will automatically lint 
 commit messages before they are committed.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return git.InstallHook()
-	},
-}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return git.InstallHook()
+		},
+	}
 
 	versionCmd = &cobra.Command{
 		Use:   "version",
@@ -65,27 +65,27 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "path to config file")
 	rootCmd.PersistentFlags().StringVar(&commitRange, "check", "HEAD^..HEAD", "commit range to check")
-    rootCmd.AddCommand(installHookCmd)
+	rootCmd.AddCommand(installHookCmd)
 	rootCmd.AddCommand(lintFileCmd)
 	rootCmd.AddCommand(versionCmd)
 }
 
 func runLinter(cmd *cobra.Command, args []string) error {
-    cfg, err := config.Load(configPath)
-    if err != nil {
-        return err
-    }
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		return err
+	}
 
-    l := linter.New(cfg)
-    return l.LintCommits(commitRange)
+	l := linter.New(cfg)
+	return l.LintCommits(commitRange)
 }
 
 func lintFile(cmd *cobra.Command, args []string) error {
-    cfg, err := config.Load(configPath)
-    if err != nil {
-        return err
-    }
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		return err
+	}
 
-    l := linter.New(cfg)
-    return l.LintCommitMessageFile(args[0])
+	l := linter.New(cfg)
+	return l.LintCommitMessageFile(args[0])
 }
