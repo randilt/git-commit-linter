@@ -2,8 +2,11 @@ package suggestion
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 type CommitCorrection struct {
@@ -22,6 +25,37 @@ type KeywordsConfig struct {
     CommitTypes  []KeywordType `yaml:"commit_types"`
     CommitScopes []KeywordType `yaml:"commit_scopes"`
 }
+
+func LoadKeywords() (*KeywordsConfig, error) {
+    // Try to find common_keywords.yaml in various locations
+    locations := []string{
+        "config/common_keywords.yaml",
+        "../config/common_keywords.yaml",
+        "../../config/common_keywords.yaml",
+    }
+
+    var configData []byte
+    var err error
+
+    for _, loc := range locations {
+        configData, err = os.ReadFile(loc)
+        if err == nil {
+            break
+        }
+    }
+
+    if err != nil {
+        return nil, err
+    }
+
+    var config KeywordsConfig
+    if err := yaml.Unmarshal(configData, &config); err != nil {
+        return nil, err
+    }
+
+    return &config, nil
+}
+
 
 // SuggestCorrection analyzes an invalid commit message and suggests corrections
 func SuggestCorrection(message string, config *KeywordsConfig) (*CommitCorrection, error) {

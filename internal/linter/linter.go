@@ -8,6 +8,7 @@ import (
 
 	"github.com/randilt/git-commit-linter/internal/config"
 	"github.com/randilt/git-commit-linter/internal/git"
+	"github.com/randilt/git-commit-linter/internal/suggestion"
 	"github.com/randilt/git-commit-linter/internal/ui"
 )
 
@@ -68,6 +69,38 @@ func (l *Linter) LintCommitMessageFile(filepath string) error {
     message := strings.Join(messageLines, "\n")
     
     return l.LintCommitMessage(strings.TrimSpace(message))
+}
+
+
+func (l *Linter) SuggestMessageCorrection(message string) (string, error) {
+    // Load keywords configuration
+    keywords, err := suggestion.LoadKeywords()
+    if err != nil {
+        return "", fmt.Errorf("failed to load keywords: %w", err)
+    }
+
+    // Get suggestion
+    correction, err := suggestion.SuggestCorrection(message, keywords)
+    if err != nil {
+        return "", err
+    }
+
+    // Format the suggested commit message
+    var suggestionBuilder strings.Builder
+
+    // Add type
+    suggestionBuilder.WriteString(correction.Type)
+
+    // Add scope if present and allowed
+    if correction.Scope != "" && !l.config.Rules.RequireScope {
+        suggestionBuilder.WriteString(fmt.Sprintf("(%s)", correction.Scope))
+    }
+
+    // Add message
+    suggestionBuilder.WriteString(": ")
+    suggestionBuilder.WriteString(correction.Message)
+
+    return suggestionBuilder.String(), nil
 }
 
 // LintCommits lints the commit messages in the given range and returns an error if any commit fails the linting rules.
@@ -154,9 +187,15 @@ func (l *Linter) lintCommit(commit git.Commit) error {
 
     matches := re.FindStringSubmatch(commit.Message)
     if matches == nil {
+        // Message format is invalid, try to suggest a correction
+        suggestion, err := l.SuggestMessageCorrection(commit.Message)
+        if err == nil && suggestion != "" {
+            return fmt.Errorf("invalid format. Did you mean: %s", ui.Bold(suggestion))
+        }
         return fmt.Errorf("invalid format")
     }
 
+    // Rest of the existing validation logic remains the same...
     commitType := matches[1]
     scope := matches[2]
     message := matches[3]
@@ -170,6 +209,11 @@ func (l *Linter) lintCommit(commit git.Commit) error {
         }
     }
     if !validType {
+        // If type is invalid, try to suggest a correction
+        suggestion, err := l.SuggestMessageCorrection(commit.Message)
+        if err == nil && suggestion != "" {
+            return fmt.Errorf("invalid type '%s'. Did you mean: %s", commitType, ui.Bold(suggestion))
+        }
         return fmt.Errorf("invalid type '%s'", commitType)
     }
 
@@ -180,7 +224,7 @@ func (l *Linter) lintCommit(commit git.Commit) error {
 
     // Check message length
     if len(message) > l.config.Rules.MaxMessageLength {
-        return fmt.Errorf("message too long (%d chars, max %d)", 
+        return fmt.Errorf("message too long (%d chars, max %d)",
             len(message), l.config.Rules.MaxMessageLength)
     }
 
