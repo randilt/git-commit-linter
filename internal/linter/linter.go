@@ -8,7 +8,6 @@ import (
 
 	"github.com/randilt/git-commit-linter/internal/config"
 	"github.com/randilt/git-commit-linter/internal/git"
-	"github.com/randilt/git-commit-linter/internal/suggestion"
 	"github.com/randilt/git-commit-linter/internal/ui"
 )
 
@@ -73,13 +72,13 @@ func (l *Linter) LintCommitMessageFile(filepath string) error {
 
 func (l *Linter) SuggestMessageCorrection(message string) (string, error) {
 	// Load keywords configuration
-	keywords, err := suggestion.LoadKeywords()
+	keywords, err := LoadKeywords()
 	if err != nil {
 		return "", fmt.Errorf("failed to load keywords: %w", err)
 	}
 
 	// Get suggestion
-	correction, err := suggestion.SuggestCorrection(message, keywords)
+	correction, err := SuggestCorrection(message, keywords)
 	if err != nil {
 		return "", err
 	}

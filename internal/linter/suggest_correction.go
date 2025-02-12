@@ -1,4 +1,4 @@
-package suggestion
+package linter
 
 import (
 	"fmt"
