@@ -6,14 +6,15 @@ import (
 	"github.com/randilt/git-commit-linter/internal/config"
 	"github.com/randilt/git-commit-linter/internal/git"
 	"github.com/randilt/git-commit-linter/internal/linter"
+	"github.com/randilt/git-commit-linter/internal/ui"
 	"github.com/spf13/cobra"
 )
 
 var (
-	version    string
-	commit     string
-	date       string
-	configPath string
+	version     string
+	commit      string
+	date        string
+	configPath  string
 	commitRange string
 
 	rootCmd = &cobra.Command{
@@ -24,15 +25,15 @@ Example: git-commit-linter --config=config.yaml --check="HEAD~5..HEAD"`,
 		RunE: runLinter,
 	}
 
-     installHookCmd = &cobra.Command{
-	Use:   "install-hook",
-	Short: "Install git commit-msg hook",
-	Long: `Installs a git commit-msg hook that will automatically lint 
+	installHookCmd = &cobra.Command{
+		Use:   "install-hook",
+		Short: "Install git commit-msg hook",
+		Long: `Installs a git commit-msg hook that will automatically lint 
 commit messages before they are committed.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return git.InstallHook()
-	},
-}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return git.InstallHook()
+		},
+	}
 
 	versionCmd = &cobra.Command{
 		Use:   "version",
@@ -50,6 +51,44 @@ commit messages before they are committed.`,
 		Args:  cobra.ExactArgs(1),
 		RunE:  lintFile,
 	}
+
+	suggestCmd = &cobra.Command{
+		Use:   "suggest",
+		Short: "Suggest a commit message based on staged changes",
+		Long: `Analyzes your staged changes and suggests an appropriate commit message
+following the conventional commits format.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load(configPath)
+			if err != nil {
+				return err
+			}
+
+			l := linter.New(cfg)
+			suggestion, err := l.SuggestCommitMessage()
+			if err != nil {
+				if err.Error() == "no staged changes found" {
+					ui.Warning("No staged changes found. Stage your changes first with 'git add'")
+					return nil
+				}
+				return err
+			}
+
+			if suggestion == nil {
+				ui.Info("Could not generate a confident suggestion based on the current changes")
+				return nil
+			}
+
+			ui.Section("Commit Message Suggestion")
+			suggestedMessage := fmt.Sprintf("%s: %s", suggestion.Type, suggestion.Message)
+			ui.Info("Based on your changes, here's a suggested commit message:")
+			ui.CodeBlock(suggestedMessage)
+
+			ui.Info("\nTo use this message:")
+			ui.CodeBlock(fmt.Sprintf("git commit -m \"%s\"", suggestedMessage))
+
+			return nil
+		},
+	}
 )
 
 func SetVersion(v, c, d string) {
@@ -65,27 +104,28 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "path to config file")
 	rootCmd.PersistentFlags().StringVar(&commitRange, "check", "HEAD^..HEAD", "commit range to check")
-    rootCmd.AddCommand(installHookCmd)
+	rootCmd.AddCommand(installHookCmd)
 	rootCmd.AddCommand(lintFileCmd)
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(suggestCmd)
 }
 
 func runLinter(cmd *cobra.Command, args []string) error {
-    cfg, err := config.Load(configPath)
-    if err != nil {
-        return err
-    }
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		return err
+	}
 
-    l := linter.New(cfg)
-    return l.LintCommits(commitRange)
+	l := linter.New(cfg)
+	return l.LintCommits(commitRange)
 }
 
 func lintFile(cmd *cobra.Command, args []string) error {
-    cfg, err := config.Load(configPath)
-    if err != nil {
-        return err
-    }
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		return err
+	}
 
-    l := linter.New(cfg)
-    return l.LintCommitMessageFile(args[0])
+	l := linter.New(cfg)
+	return l.LintCommitMessageFile(args[0])
 }
