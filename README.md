@@ -148,19 +148,21 @@ docs(readme): update installation instructions
 When the linter finds issues, it provides clear error messages and fix instructions:
 
 ```
-Linting Issues Found:
-==================
+Linting Issues Found
+────────────────────
+✗ Commit 91170f3e: message too long (77 chars, max 72)
+┌───────────────────────────────────────────────────┐
+│ Fix Instructions:                                 │
+│ - Older commit: Use interactive rebase            │
+│   git rebase -i 91170f3e~1                        │
+│   Change 'pick' to 'reword' for the target commit │
+└───────────────────────────────────────────────────┘
 
-Commit abc1234: message too long (80 chars, max 72)
-Fix Instructions:
-- Older commit: Use interactive rebase
-  git rebase -i abc1234~1
-  Change 'pick' to 'reword' for the target commit
-
-Reference Information:
-====================
-Valid commit format: type(scope): message (max 72 chars)
-Allowed types: feat, fix, docs, style, refactor, test, chore
+Reference Information
+─────────────────────
+ℹ Valid commit format: type(scope): message (max 72 chars)
+ℹ Allowed types: feat, fix, docs, style, refactor, test, chore
+✗ Some commits failed linting - please fix the issues above
 ```
 
 ### Common Fixes
