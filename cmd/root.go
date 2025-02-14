@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/randilt/git-commit-linter/internal/config"
 	"github.com/randilt/git-commit-linter/internal/git"
@@ -83,9 +84,17 @@ func runLinter(cmd *cobra.Command, args []string) error {
 func lintFile(cmd *cobra.Command, args []string) error {
 	cfg, err := config.Load(configPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to load config: %w", err)
 	}
 
 	l := linter.New(cfg)
-	return l.LintCommitMessageFile(args[0])
+	if err := l.LintCommitMessageFile(args[0]); err != nil {
+		if _, ok := err.(*linter.ValidationError); ok {
+			// For validation errors, just exit with status code 1
+			os.Exit(1)
+		}
+		// For other errors, return them to cobra
+		return err
+	}
+	return nil
 }

@@ -20,6 +20,13 @@ type LintError struct {
 	Message    string
 	FixSteps   string
 }
+type ValidationError struct {
+	Message string
+}
+
+func (e *ValidationError) Error() string {
+	return e.Message
+}
 
 func New(cfg *config.Config) *Linter {
 	return &Linter{config: cfg}
@@ -43,7 +50,7 @@ func (l *Linter) LintCommitMessage(message string) error {
 		ui.Info(fmt.Sprintf("Allowed types: %s",
 			ui.Bold(strings.Join(l.config.Types, ", "))))
 
-		return fmt.Errorf("commit message failed linting - please fix the issues above")
+		return &ValidationError{"commit message failed linting"}
 	}
 
 	ui.Success("Commit message passed linting!")
