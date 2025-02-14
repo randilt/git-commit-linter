@@ -2,6 +2,8 @@
 
 A command-line tool that enforces consistent Git commit message formats across your projects. This linter helps teams maintain clean and meaningful commit histories by validating commit messages against predefined rules.
 
+![Demo gif of the tool](https://github.com/user-attachments/assets/e6e8ba0a-dc20-46ee-90ca-b2c7484ee675)
+
 ## Features
 
 - Validates commit message format (`type(scope): message`)
