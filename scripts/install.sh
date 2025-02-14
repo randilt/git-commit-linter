@@ -12,6 +12,7 @@ LATEST_RELEASE_URL="https://api.github.com/repos/$GITHUB_USER/$REPO_NAME/release
 
 # Color output
 RED='\033[0;31m'
+YELLOW='\033[0;33m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m'
@@ -31,11 +32,21 @@ print_error() {
     echo -e "${RED}Error:${NC} $1"
 }
 
+# Print warn message
+print_warn() {
+    echo -e "${YELLOW}Warning:${NC} $1"
+}
+
 # Cleanup on exit
 cleanup() {
     rm -rf "$TMP_DIR"
 }
 trap cleanup EXIT
+
+# Warn that sudo access may be required in middle of script
+if [ "$EUID" -ne 0 ]; then
+    print_warn "This installation may require sudo access to install $BINARY_NAME to $INSTALL_DIR"
+fi
 
 # Check if curl or wget is available
 if command -v curl >/dev/null 2>&1; then
