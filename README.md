@@ -13,7 +13,25 @@ A command-line tool that enforces consistent Git commit message formats across y
 
 ## Installation
 
-A standalone installer will be available soon. In the meantime, you can install the by building it from source.
+You can install the Git Commit Linter using the automated installation scripts or manually from the releases page.
+
+### Quick Install
+
+#### Unix-like Systems (macOS and Linux)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/randilt/git-commit-linter/main/scripts/install.sh | bash
+```
+
+Or using wget:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/randilt/git-commit-linter/main/scripts/install.sh | bash
+```
+
+#### Windows
+
+Coming soon!! For the time being, you can build it from source code or get it from the [releases page](https://github.com/randilt/git-commit-linter/releases).
 
 ### From Source
 
