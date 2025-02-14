@@ -96,30 +96,32 @@ print_step "Downloading latest release..."
 cd "$TMP_DIR"
 $DOWNLOAD_CMD "$DOWNLOAD_URL" | tar xz
 
-# Check if binary exists
-print_step "Debugging directory contents..."
-echo "Content of TMP_DIR ($TMP_DIR):"
-ls -la "$TMP_DIR"
 
-if [ -d "$TMP_DIR/$REPO_NAME" ]; then
-    echo "Content of $TMP_DIR/$REPO_NAME:"
-    ls -la "$TMP_DIR/$REPO_NAME"
-else
-    print_error "Repository directory not found in $TMP_DIR"
-    exit 1
-fi
+# print_step "Debugging directory contents..."
+# echo "Content of TMP_DIR ($TMP_DIR):"
+# ls -la "$TMP_DIR"
 
-if [ ! -f "$TMP_DIR/$REPO_NAME/$BINARY_NAME" ]; then
-    print_error "Binary not found in the downloaded archive"
-    exit 1
-fi
+EXTRACTED_DIR="$TMP_DIR/git-commit-linter_${OS}_${ARCH}"
+# if [ -d "$EXTRACTED_DIR" ]; then
+#     echo "Content of $EXTRACTED_DIR:"
+#     ls -la "$EXTRACTED_DIR"
+# else
+#     print_error "Repository directory not found in $TMP_DIR"
+#     exit 1
+# fi
+
+# if [ ! -f "$EXTRACTED_DIR/$BINARY_NAME" ]; then
+#     print_error "Binary not found in the downloaded archive"
+#     exit 1
+# fi
+
 
 # Install binary
 print_step "Installing $BINARY_NAME to $INSTALL_DIR..."
 if [ -w "$INSTALL_DIR" ]; then
-    mv "$TMP_DIR/$REPO_NAME/$BINARY_NAME" "$INSTALL_DIR/"
+    mv "$EXTRACTED_DIR/$BINARY_NAME" "$INSTALL_DIR/"
 else
-    sudo mv "$TMP_DIR/$REPO_NAME/$BINARY_NAME" "$INSTALL_DIR/"
+    sudo mv "$EXTRACTED_DIR/$BINARY_NAME" "$INSTALL_DIR/"
 fi
 
 # Make binary executable
@@ -135,7 +137,7 @@ print_step "You can now use it by running: $BINARY_NAME"
 # Verify installation
 if command -v $BINARY_NAME >/dev/null 2>&1; then
     print_success "Installation verified successfully!"
-    $BINARY_NAME --version
+    $BINARY_NAME version
 else
     print_error "Installation seems to have failed. Please check if $INSTALL_DIR is in your PATH"
     exit 1
