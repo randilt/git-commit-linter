@@ -33,7 +33,45 @@ wget -qO- https://raw.githubusercontent.com/randilt/git-commit-linter/main/scrip
 
 #### Windows
 
-Coming soon!! For the time being, you can build it from source code or get it from the [releases page](https://github.com/randilt/git-commit-linter/releases).
+Open PowerShell as Administrator and run:
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/randilt/git-commit-linter/main/scripts/install.ps1'))
+```
+
+### Manual Installation
+
+If you prefer to install manually, you can download the appropriate binary for your system from our [releases page](https://github.com/randilt/git-commit-linter/releases).
+
+#### Unix-like Systems (macOS and Linux)
+
+1. Download the appropriate tar.gz file for your system
+2. Extract the archive: `tar xzf git-commit-linter_*.tar.gz`
+3. Move the binary to your PATH:
+   ```bash
+   sudo mv git-commit-linter_[your os and arch]/git-commit-linter /usr/local/bin/
+   sudo chmod +x /usr/local/bin/git-commit-linter
+   ```
+
+#### Windows
+
+1. Download the git-commit-linter_Windows_x86_64.zip file from the releases page
+2. Extract the archive to a permanent location (e.g., `C:\Program Files\GitKit`)
+3. Add the installation directory to your PATH:
+   - Open System Properties (Win + Pause)
+   - Click "Advanced system settings"
+   - Click "Environment Variables"
+   - Under "User variables", select "Path" and click "Edit"
+   - Click "New" and add the installation directory path
+   - Click "OK" to save
+
+### Verifying Installation
+
+After installation, verify that it's working correctly:
+
+```bash
+git-commit-linter version
+```
 
 ### From Source
 
