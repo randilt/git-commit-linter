@@ -112,7 +112,7 @@ $DOWNLOAD_CMD "$DOWNLOAD_URL" | tar xz
 # echo "Content of TMP_DIR ($TMP_DIR):"
 # ls -la "$TMP_DIR"
 
-EXTRACTED_DIR="$TMP_DIR/git-commit-linter_${OS}_${ARCH}"
+EXTRACTED_DIR="$TMP_DIR/${BINARY_NAME}_${OS}_${ARCH}"
 # if [ -d "$EXTRACTED_DIR" ]; then
 #     echo "Content of $EXTRACTED_DIR:"
 #     ls -la "$EXTRACTED_DIR"
